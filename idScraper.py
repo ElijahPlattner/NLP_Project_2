@@ -5,41 +5,48 @@ api_key = 'AIzaSyDgWWxgNb_2-x5stWsI14xUujW8qIYP_n4'
 
 youtube = build('youtube', 'v3', developerKey=api_key)
 
-nextPageToken = ""
-videos = []
-for page in range(5):
+countries_info = {
+    'France': {'location': "46.8115,1.6862", 'locationRadius': "1000km", 'relevanceLanguage': "fr"},
+    'Korea': {'location': "36.3504,127.3845", 'locationRadius': "1000km", 'relevanceLanguage': "ko"},
+    'Japan': {'location': "35.1815,136.9066", 'locationRadius': "1000km", 'relevanceLanguage': "ja"},
+    'Norway': {'location': "62.0736,9.1220", 'locationRadius': "1000km", 'relevanceLanguage': "no"},
+    'Germany': {'location': "50.9787,11.0328", 'locationRadius': "1000km", 'relevanceLanguage': "de"},
+    'USA East Coast': {'location': "38.9072,-77.0369", 'locationRadius': "1000km", 'relevanceLanguage': "en"},
+    'USA West Coast': {'location': "37.7749,-122.4194", 'locationRadius': "1000km", 'relevanceLanguage': "en"}
+}
+
+all_videos = []
+
+for country, info in countries_info.items():
+    nextPageToken = None
+    videos = []
+    print(f"Processing {country}...")
     request = youtube.search().list(
         part="snippet",
-        q="lgbq",
+        q="lgbtq",
         type="video",
-        location = "39.466354,-106.210162",
-        locationRadius = "1000km",
-        relevanceLanguage = "en",
+        location=info['location'],
+        locationRadius=info['locationRadius'],
+        relevanceLanguage=info['relevanceLanguage'],
         videoDuration="medium",
         publishedAfter="2024-03-25T00:00:00Z",
         maxResults=50,
         pageToken=nextPageToken
     )
-
     response = request.execute()
-
-    if page != 1:
-        nextPageToken = response['nextPageToken']
 
     if 'items' in response:
         for item in response['items']:
-            video = {
-                'id': item['id']['videoId']
-            }
+            video = {'id': item['id']['videoId']}
             videos.append(video)
-            print(video)
+    else:
+        print(f"No videos found for {country}")
 
-    print(str(page) + "...")
-print(videos)
+    country_videos = {country: videos}
+    all_videos.append(country_videos)
 
-# Save the data to a new JSON file
-json_file_path = 'west_usa'
+json_file_path = 'videos_ID_country.json'
 with open(json_file_path, 'w') as json_file:
-    json.dump(videos, json_file, indent=2)
+    json.dump(all_videos, json_file, indent=2)
 
-print("JSON file done!")
+print("JSON file with all countries' videos done!")
