@@ -5,41 +5,49 @@ api_key = 'AIzaSyDgWWxgNb_2-x5stWsI14xUujW8qIYP_n4'
 
 youtube = build('youtube', 'v3', developerKey=api_key)
 
-nextPageToken = ""
-videos = []
-for page in range(5):
+countries_info = {
+    'France': {'query': "mariage homosexuel",'location': "46.8115,1.6862", 'locationRadius': "550km", 'relevanceLanguage': "fr"},
+    'Korea': {'query': "동성결혼",'location': "36.3504,127.3845", 'locationRadius': "260km", 'relevanceLanguage': "ko"},
+    'Japan': {'query': "同性愛者の結婚",'location': "36.099059,138.778529", 'locationRadius': "1000km", 'relevanceLanguage': "ja"},
+    'Germany': {'query': "homosexuelle Ehe",'location': "50.9787,11.0328", 'locationRadius': "400km", 'relevanceLanguage': "de"},
+    'USA East Coast': {'query': "homosexual marriage",'location': "38.9072,-77.0369", 'locationRadius': "1000km", 'relevanceLanguage': "en"},
+    'USA West Coast': {'query': "homosexual marriage",'location': "37.7749,-122.4194", 'locationRadius': "1000km", 'relevanceLanguage': "en"},
+    'Poland' : {'query': "małżeństwa homoseksualne",'location': "52.0024862,19.2765179", 'locationRadius': "400km", 'relevanceLanguage': "pl"},
+    'Norway': {'query': "homofilt ekteskap",'location': "62.0736,9.1220", 'locationRadius': "500km", 'relevanceLanguage': "no"}
+}
+
+all_videos = []
+
+for country, info in countries_info.items():
+    nextPageToken = None
+    videos = []
+    print(f"Processing {country}...")
     request = youtube.search().list(
         part="snippet",
-        q="lgbq",
+        q=info['query'],
         type="video",
-        location = "39.466354,-106.210162",
-        locationRadius = "1000km",
-        relevanceLanguage = "en",
+        # location=info['location'],
+        # locationRadius=info['locationRadius'],
+        relevanceLanguage=info['relevanceLanguage'],
         videoDuration="medium",
-        publishedAfter="2024-03-25T00:00:00Z",
+        publishedAfter="2020-01-01T00:00:00Z",
         maxResults=50,
         pageToken=nextPageToken
     )
-
     response = request.execute()
-
-    if page != 1:
-        nextPageToken = response['nextPageToken']
 
     if 'items' in response:
         for item in response['items']:
-            video = {
-                'id': item['id']['videoId']
-            }
+            video = {'id': item['id']['videoId']}
             videos.append(video)
-            print(video)
+    else:
+        print(f"No videos found for {country}")
 
-    print(str(page) + "...")
-print(videos)
+    country_videos = {country: videos}
+    all_videos.append(country_videos)
 
-# Save the data to a new JSON file
-json_file_path = 'west_usa'
+json_file_path = 'videos_ID_country1.json'
 with open(json_file_path, 'w') as json_file:
-    json.dump(videos, json_file, indent=2)
+    json.dump(all_videos, json_file, indent=2)
 
-print("JSON file done!")
+print("JSON file with all countries' videos done!")
