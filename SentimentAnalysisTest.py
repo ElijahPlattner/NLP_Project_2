@@ -1,6 +1,6 @@
-from youtube_transcript_api import YouTubeTranscriptApi
 from deepmultilingualpunctuation import PunctuationModel
 import nltk
+import json
 nltk.download('punkt')
 nltk.download('vader_lexicon')
 nltk.download('stopwords')
@@ -19,20 +19,10 @@ def remove_stopwords(text):
    clean_text = ' '.join(filtered)
    return clean_text
 
-def prep_text(video_id):
-   try:
-      transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-      transcript = transcript_list.find_transcript(['fr'])
-      transcript_translated = transcript.translate('en')
-      trans = transcript_translated.fetch()
-      text = ' '.join([str(line['text']) for line in trans])
-      result = model.restore_punctuation(text)
-      clean_text = remove_stopwords(result)
-      sent_text = nltk.sent_tokenize(clean_text)
-      return sent_text
-   except :
-      print(f"Error: Transcript for {video_id} not found.")
-      return []
+def prep_text(transcript):
+   clean_text = remove_stopwords(transcript)
+   sent_text = nltk.sent_tokenize(clean_text)
+   return sent_text
 
 
 def sentiment_analysis(text):
@@ -41,16 +31,27 @@ def sentiment_analysis(text):
 
 
 def main():
-   text = prep_text("9Hv0V2nMprY")
-   sentiment = sentiment_analysis(text)
-   n = len(text)
-   avg = sentiment / n if n > 0 else 0
-   print("Sentiment analysis result:", avg)
-   if avg > 0.05:
-      print("This video's sentiments are positive")
-   elif 0.05 >= avg >= -0.05:
-      print("This video's sentiments are neutral")
-   else:
-      print("This video's sentiments are negative")
+   f = open("transcripts.json")
+   raw = json.load(f)
+   f.close()
+
+   for country_transcripts in raw:
+      for country, transcripts in country_transcripts.items():
+         sentiment = 0
+         print(country)
+         for transcript in transcripts:
+            text = prep_text(transcript)
+            text_len = len(text)
+            transcript_sentiment = sentiment_analysis(text)/text_len
+            sentiment += transcript_sentiment
+
+         country_sentiment = sentiment/len(transcripts)
+         print(f"Sentiment analysis result for {country}:", country_sentiment)
+         if country_sentiment > 0.05:
+            print(f"{country}'s sentiments are positive")
+         elif 0.05 >= country >= -0.05:
+            print(f"{country}'s sentiments are neutral")
+         else:
+            print(f"{country}'s sentiments are negative")
 
 main()
