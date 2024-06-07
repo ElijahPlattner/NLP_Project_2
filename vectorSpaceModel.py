@@ -7,14 +7,17 @@ import math
 FILENAME = "anti-lgbt-cyberbullying.csv"
 
 
-def get_data_from_CSV():
+def get_data_from_CSV(negative):
     with open(FILENAME, encoding="utf8") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        negative_data = {}
+        data = {}
         ids = []
         text = ""
+        indicator = '1'
+        if (negative == False):
+            indicator = '0'
         for row in reader:
-            if (row[2] == '1'):
+            if (row[2] == indicator):
                 ids.append(row[0])
                 text = row[1]
                 text = re.sub(r'\b\'s\b', '', text)
@@ -22,8 +25,8 @@ def get_data_from_CSV():
                 text = re.sub( r'[^\w\s\']', '', text)
                 text = text.lower()
                 text = text.split(" ")
-                negative_data[row[0]] = text
-    return(negative_data, ids)
+                data[row[0]] = text
+    return(data, ids)
 
 def create_dict(data):
     dict_nlp = {}
@@ -117,20 +120,33 @@ class VectorSpaceModel:
                 ranked.append([self.ids_og[i], res[i]])
         ranked = sorted(ranked, key=lambda x: x[1], reverse=True)
         return ranked
+    
+    def mean_cosine_similarity(self, ranked):
+        mean = -1
+        max = 5
+        if (len(ranked) < max):
+            max = len(ranked)
+        else:
+            mean = 0
+        for i in range (0, max):
+            mean = mean + ranked[i][1]
+        mean = mean / max
+        return mean
 
-    def test(self):
-        query = self.prepare_query("gay people should be treated with respect")
+    def evaluate(self, query_text):
+        query = self.prepare_query(query_text)
         self.append_query_to_dict(query)
         matrix = self.create_weights_matrix()
         vspace = self.create_vector_space(matrix)
         ranked = self.ranked_search(vspace)
-        print(ranked)
+        mean = self.mean_cosine_similarity(ranked)
+        return mean
 
-def main():
-    data, ids = get_data_from_CSV()
-    dict_nlp = create_dict(data)
-    test = VectorSpaceModel(dict_nlp, ids)
-    test.test()
-
-if __name__ == '__main__':
-    main()
+def get_mean_cosine_similarity(text, dict_nlp={}, ids=[]):
+        if (len(dict_nlp) == 0 or len(ids) == 0):
+            data, ids = get_data_from_CSV(True)
+            dict_nlp = create_dict(data)
+        test = VectorSpaceModel(dict_nlp, ids)
+        #above mean = 0.3, it can be considered as against the LGBT cause
+        mean = test.evaluate(text)
+        return mean
