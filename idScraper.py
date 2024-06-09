@@ -31,7 +31,7 @@ for country, info in countries_info.items():
         relevanceLanguage=info['relevanceLanguage'],
         videoDuration="medium",
         publishedAfter="2020-01-01T00:00:00Z",
-        maxResults=5,
+        maxResults=25,
         pageToken=nextPageToken
     )
     response = request.execute()

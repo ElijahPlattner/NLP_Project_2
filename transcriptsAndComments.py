@@ -6,7 +6,6 @@ from googleapiclient.discovery import build
 import requests
 import time
 import deepl
-
 model = PunctuationModel()
 
 DEEPL_API_KEY = 'a492ab27-f349-4022-b36e-5535e251c7f0:fx'
@@ -26,12 +25,12 @@ def get_transcript(video_id):
     result = model.restore_punctuation(text)
     return result
 
-def get_comments(video_id, api_key):
+def get_comments(video_id, api_key, max_results):
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.commentThreads().list(
         part='snippet',
         videoId=video_id,
-        maxResults=10
+        maxResults=max_results
     )
     comments = []
 
@@ -43,13 +42,15 @@ def get_comments(video_id, api_key):
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
                 comments.append(comment)
+                if len(comments) >= max_results:
+                    break 
 
-            if 'nextPageToken' in response:
+            if 'nextPageToken' in response and len(comments) < max_results:
                 request = youtube.commentThreads().list(
                     part='snippet',
                     videoId=video_id,
                     pageToken=response['nextPageToken'],
-                    maxResults=10
+                    maxResults=max_results - len(comments)
                 )
             else:
                 break
@@ -85,7 +86,7 @@ for country_data in raw:
             except NoTranscriptFound:
                 print(f"No transcript found for the video with ID {id}.")
 
-            comments = get_comments(id, api_key)
+            comments = get_comments(id, api_key, max_results=10)
             translated_comments = [translate_comment(comment) for comment in comments]
 
             transcript_data = {
@@ -94,9 +95,11 @@ for country_data in raw:
                 "comments": translated_comments
             }
             transcripts.append(transcript_data)
+            time.sleep(5)
 
         country_videos = {country: transcripts}
         all_transcripts.append(country_videos)
+
 
 json_file_path = 'transcripts.json'
 with open(json_file_path, 'w') as json_file:
