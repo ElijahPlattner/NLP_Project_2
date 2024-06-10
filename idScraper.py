@@ -31,7 +31,7 @@ for country, info in countries_info.items():
         relevanceLanguage=info['relevanceLanguage'],
         videoDuration="medium",
         publishedAfter="2020-01-01T00:00:00Z",
-        maxResults=50,
+        maxResults=25,
         pageToken=nextPageToken
     )
     response = request.execute()
@@ -46,7 +46,7 @@ for country, info in countries_info.items():
     country_videos = {country: videos}
     all_videos.append(country_videos)
 
-json_file_path = 'videos_ID_country1.json'
+json_file_path = 'sample_videos.json'
 with open(json_file_path, 'w') as json_file:
     json.dump(all_videos, json_file, indent=2)
 
