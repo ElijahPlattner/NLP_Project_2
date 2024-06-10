@@ -26,6 +26,7 @@ def get_data_from_CSV(negative):
                 text = text.lower()
                 text = text.split(" ")
                 data[row[0]] = text
+        csvfile.close()
     return(data, ids)
 
 def create_dict(data):
@@ -122,16 +123,18 @@ class VectorSpaceModel:
         return ranked
     
     def mean_cosine_similarity(self, ranked):
-        mean = -1
-        max = 5
-        if (len(ranked) < max):
-            max = len(ranked)
-        else:
-            mean = 0
-        for i in range (0, max):
-            mean = mean + ranked[i][1]
-        mean = mean / max
-        return mean
+        if (len(ranked) > 0):
+            mean = -1
+            max = 5
+            if (len(ranked) < max):
+                max = len(ranked)
+            else:
+                mean = 0
+            for i in range (0, max):
+                mean = mean + ranked[i][1]
+            mean = mean / max
+            return mean
+        return 0.0
 
     def evaluate(self, query_text):
         query = self.prepare_query(query_text)
@@ -143,10 +146,12 @@ class VectorSpaceModel:
         return mean
 
 def get_mean_cosine_similarity(text, dict_nlp={}, ids=[]):
-        if (len(dict_nlp) == 0 or len(ids) == 0):
-            data, ids = get_data_from_CSV(True)
-            dict_nlp = create_dict(data)
-        test = VectorSpaceModel(dict_nlp, ids)
-        #above mean = 0.3, it can be considered as against the LGBT cause
-        mean = test.evaluate(text)
-        return mean
+        if (len(text) > 0):
+            if (len(dict_nlp) == 0 or len(ids) == 0):
+                data, ids = get_data_from_CSV(True)
+                dict_nlp = create_dict(data)
+            test = VectorSpaceModel(dict_nlp, ids)
+            #above mean = 0.3, it can be considered as against the LGBT cause
+            mean = test.evaluate(text)
+            return mean
+        return 0.0
