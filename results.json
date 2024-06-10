@@ -1,49 +1,49 @@
 {
   "France": {
     "sentiment": 0.1894609294626191,
-    "comments_sentiment": -0.021753945526695496,
+    "comments_sentiment": -0.004350789105339106,
     "cosine_similarity": 0.22740955990418668,
     "cosine_similarity_comments": 0.10759973869039566
   },
   "Korea": {
     "sentiment": 0.09193814707278261,
-    "comments_sentiment": 0.09815866666666669,
+    "comments_sentiment": 0.013659483333333338,
     "cosine_similarity": 0.1661889800034432,
     "cosine_similarity_comments": 0.10437844683116429
   },
   "Japan": {
     "sentiment": 0.20902050014347862,
-    "comments_sentiment": 0.592786976190476,
+    "comments_sentiment": 0.11855739523809525,
     "cosine_similarity": 0.22042343121750557,
     "cosine_similarity_comments": 0.15686360700166224
   },
   "Germany": {
     "sentiment": 0.16753512044682412,
-    "comments_sentiment": 9.532313131868131,
+    "comments_sentiment": 0.19064626263736267,
     "cosine_similarity": 0.2271352147129789,
     "cosine_similarity_comments": 0.12724543615803574
   },
   "USA East Coast": {
     "sentiment": 0.18569482116871866,
-    "comments_sentiment": 1.073267913003663,
+    "comments_sentiment": 0.2146535826007326,
     "cosine_similarity": 0.23310556719756184,
     "cosine_similarity_comments": 0.10795983908776985
   },
   "USA West Coast": {
     "sentiment": 0.19020562499646984,
-    "comments_sentiment": 1.1176299083452779,
+    "comments_sentiment": 0.22352598166905557,
     "cosine_similarity": 0.22790593133531356,
     "cosine_similarity_comments": 0.08621260286330266
   },
   "Poland": {
     "sentiment": 0.0,
-    "comments_sentiment": 0.23787710529666412,
+    "comments_sentiment": 0.06717004732195907,
     "cosine_similarity": 0.0,
     "cosine_similarity_comments": 0.10654731608700793
   },
   "Norway": {
     "sentiment": 0.0,
-    "comments_sentiment": 0.7712253333333334,
+    "comments_sentiment": 0.11881453333333333,
     "cosine_similarity": 0.0,
     "cosine_similarity_comments": 0.10661857485234183
   }

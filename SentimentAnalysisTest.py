@@ -54,32 +54,34 @@ def main():
          res[country] = {}
          sentiment = 0
          comment_sentiment = 0
-         country_sentiment_comment = 0
          cosine_similarity = 0.0
          cosine_similarity_comments = 0.0
          for video in data:
             tmp_comments_cosine_similarity = 0.0
+            tmp_comments_sentiment = 0.0
             transcript = video['transcript']
             sentiment += get_sentiment_from_text(transcript)
             cosine_similarity += get_mean_cosine_similarity(transcript, dict_nlp, ids)
             for comment in video['comments']:
-               comment_sentiment += get_sentiment_from_text(comment)
+               tmp_comments_sentiment += get_sentiment_from_text(comment)
                tmp_comments_cosine_similarity += get_mean_cosine_similarity(comment, dict_nlp, ids)
             if (len(video['comments']) > 0):
-               country_sentiment_comment = comment_sentiment/len(video['comments'])
+               tmp_comments_sentiment = tmp_comments_sentiment/len(video['comments'])
                tmp_comments_cosine_similarity = tmp_comments_cosine_similarity/len(video['comments'])
             cosine_similarity_comments += tmp_comments_cosine_similarity
+            comment_sentiment += tmp_comments_sentiment
 
          country_sentiment = sentiment/len(data)
+         comment_sentiment = comment_sentiment/len(data)
          country_cosine_similarity = cosine_similarity/len(data)
          cosine_similarity_comments = cosine_similarity_comments/len(data)
          res[country]["sentiment"] = country_sentiment
-         res[country]["comments_sentiment"] = country_sentiment_comment
+         res[country]["comments_sentiment"] = comment_sentiment
          res[country]["cosine_similarity"] = country_cosine_similarity
          res[country]["cosine_similarity_comments"] = cosine_similarity_comments
          print("\n")
          print(f"Sentiment analysis result for {country}'s videos:", country_sentiment)
-         print(f"Mean Sentiment analysis result for {country}'s comments:", country_sentiment_comment)
+         print(f"Mean Sentiment analysis result for {country}'s comments:", comment_sentiment)
          print(f"Mean Cosine Similarity for {country}'s videos:", country_cosine_similarity)
          print(f"Mean Cosine Similarity for {country}'s comments:", cosine_similarity_comments)
          if country_sentiment > 0.05:
@@ -88,9 +90,9 @@ def main():
             print(f"{country}'s videos sentiments are neutral")
          else:
             print(f"{country}'s videos sentiments are negative")
-         if country_sentiment_comment > 0.05:
+         if comment_sentiment > 0.05:
             print(f"{country}'s comments sentiments are positive")
-         elif 0.05 >= country_sentiment_comment >= -0.05:
+         elif 0.05 >= comment_sentiment >= -0.05:
             print(f"{country}'s comments sentiments are neutral")
          else:
             print(f"{country}'s comments sentiments are negative")
